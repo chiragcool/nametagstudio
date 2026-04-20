@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NameTag Studio – Custom Name Slips for Notebooks</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --cream: #faf7f2;
+    --warm: #f5efe6;
+    --accent: #e8632a;
+    --accent2: #f0a500;
+    --green: #2d6a4f;
+    --light-ink: #4a4a6a;
+    --border: #e2d9cc;
+    --card-bg: #ffffff;
+    --shadow: 0 4px 24px rgba(26,26,46,0.10);
+    --shadow-lg: 0 12px 48px rgba(26,26,46,0.16);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--cream);
+    border-bottom: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5vw; height: 64px;
+    backdrop-filter: blur(12px);
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 900;
+    color: var(--ink); letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 2rem; align-items: center; }
+  .nav-links a { text-decoration: none; color: var(--light-ink); font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-cta {
+    background: var(--ink); color: #fff;
+    padding: 0.55rem 1.4rem; border-radius: 100px;
+    font-size: 0.88rem; font-weight: 600; text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .nav-cta:hover { background: var(--accent); transform: translateY(-1px); color: #fff; }
+
+  /* HERO */
+  .hero {
+    display: grid; grid-template-columns: 1fr 1fr;
+    min-height: 88vh; padding: 0 5vw;
+    align-items: center; gap: 4rem;
+    background: var(--cream);
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -120px; right: -80px;
+    width: 520px; height: 520px;
+    background: radial-gradient(circle, #f0a50033 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: -100px; left: 10%;
+    width: 380px; height: 380px;
+    background: radial-gradient(circle, #e8632a18 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-text { position: relative; z-index: 2; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: #fff; border: 1.5px solid var(--border);
+    padding: 0.35rem 1rem; border-radius: 100px;
+    font-size: 0.8rem; font-weight: 600; color: var(--green);
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .hero-badge::before { content: '✦'; color: var(--accent2); }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 5vw, 4.2rem);
+    line-height: 1.08; font-weight: 900;
+    color: var(--ink); margin-bottom: 1.2rem;
+    letter-spacing: -1px;
+  }
+  h1 em { font-style: normal; color: var(--accent); }
+  .hero-sub {
+    font-size: 1.1rem; color: var(--light-ink); line-height: 1.7;
+    max-width: 480px; margin-bottom: 2rem;
+    font-weight: 400;
+  }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    padding: 0.85rem 2rem; border-radius: 100px;
+    font-weight: 700; font-size: 1rem;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(232,99,42,0.35);
+    display: inline-block;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(232,99,42,0.4); }
+  .btn-outline {
+    background: transparent; color: var(--ink);
+    padding: 0.85rem 2rem; border-radius: 100px;
+    font-weight: 600; font-size: 1rem;
+    text-decoration: none; border: 2px solid var(--border); cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    display: inline-block;
+  }
+  .btn-outline:hover { border-color: var(--ink); background: var(--warm); }
+
+  .hero-stats {
+    display: flex; gap: 2.5rem; margin-top: 2.5rem;
+    padding-top: 2rem; border-top: 1px solid var(--border);
+  }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; color: var(--ink); }
+  .stat-label { font-size: 0.78rem; color: var(--light-ink); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* HERO VISUAL */
+  .hero-visual {
+    position: relative; z-index: 2;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .slip-preview-stack {
+    position: relative; width: 340px; height: 320px;
+  }
+  .slip-card {
+    position: absolute;
+    width: 280px; padding: 1.5rem 2rem;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    border: 1.5px solid var(--border);
+  }
+  .slip-card.card-1 { top: 0; left: 30px; transform: rotate(-4deg); background: #fff8f0; border-color: #e8632a44; }
+  .slip-card.card-2 { top: 60px; left: 0; transform: rotate(2deg); z-index: 3; }
+  .slip-card.card-3 { top: 120px; left: 50px; transform: rotate(-1.5deg); background: #f0f8f4; border-color: #2d6a4f44; }
+  .slip-school { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--light-ink); margin-bottom: 0.3rem; }
+  .slip-name { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--ink); }
+  .slip-class { font-size: 0.85rem; color: var(--light-ink); margin-top: 0.2rem; }
+  .slip-deco {
+    position: absolute; right: 1rem; top: 50%;
+    transform: translateY(-50%);
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+  }
+  .slip-deco-1 { background: #fff0e8; }
+  .slip-deco-2 { background: #fef3cd; }
+  .slip-deco-3 { background: #e8f5ee; }
+
+  /* SECTION COMMONS */
+  section { padding: 5rem 5vw; }
+  .section-label {
+    font-size: 0.78rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--accent); margin-bottom: 0.8rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 900; color: var(--ink);
+    line-height: 1.15; margin-bottom: 1rem;
+    letter-spacing: -0.5px;
+  }
+  .section-sub { font-size: 1rem; color: var(--light-ink); max-width: 540px; line-height: 1.7; }
+
+  /* HOW IT WORKS */
+  .how-it-works { background: var(--ink); color: #fff; }
+  .how-it-works .section-label { color: var(--accent2); }
+  .how-it-works .section-title { color: #fff; }
+  .how-it-works .section-sub { color: #b0b0c8; }
+  .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; margin-top: 3.5rem; }
+  .step {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px; padding: 2rem 1.5rem;
+    position: relative; transition: transform 0.2s, background 0.2s;
+  }
+  .step:hover { transform: translateY(-4px); background: rgba(255,255,255,0.09); }
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem; font-weight: 900;
+    color: rgba(255,255,255,0.08); line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .step-icon { font-size: 2rem; margin-bottom: 1rem; }
+  .step-title { font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 0.5rem; }
+  .step-desc { font-size: 0.88rem; color: #9090b0; line-height: 1.6; }
+
+  /* ORDER FORM */
+  .order-section { background: var(--warm); }
+  .order-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-top: 3rem; align-items: start; }
+  .form-card {
+    background: #fff; border-radius: 24px;
+    padding: 2.5rem; box-shadow: var(--shadow);
+    border: 1.5px solid var(--border);
+  }
+  .form-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; margin-bottom: 1.8rem; color: var(--ink); }
+  .form-group { margin-bottom: 1.3rem; }
+  label { display: block; font-size: 0.83rem; font-weight: 600; color: var(--light-ink); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.4px; }
+  input, select, textarea {
+    width: 100%; padding: 0.75rem 1rem;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+    color: var(--ink); background: var(--cream);
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(232,99,42,0.12);
+    background: #fff;
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .quantity-control {
+    display: flex; align-items: center; gap: 0;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    overflow: hidden; background: var(--cream);
+    width: fit-content;
+  }
+  .qty-btn {
+    width: 44px; height: 44px; border: none;
+    background: transparent; cursor: pointer;
+    font-size: 1.2rem; color: var(--ink);
+    transition: background 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qty-btn:hover { background: var(--warm); }
+  #qty-display {
+    width: 56px; text-align: center;
+    border: none; border-left: 1.5px solid var(--border); border-right: 1.5px solid var(--border);
+    background: transparent; font-weight: 700; font-size: 1rem;
+    padding: 0;
+  }
+  .price-breakdown {
+    background: var(--warm); border-radius: 14px;
+    padding: 1.3rem 1.5rem; margin: 1.5rem 0;
+    border: 1px solid var(--border);
+  }
+  .price-row { display: flex; justify-content: space-between; font-size: 0.88rem; color: var(--light-ink); padding: 0.3rem 0; }
+  .price-row.total { font-weight: 700; font-size: 1rem; color: var(--ink); border-top: 1px solid var(--border); margin-top: 0.4rem; padding-top: 0.7rem; }
+  .submit-btn {
+    width: 100%; padding: 1rem;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(232,99,42,0.3);
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(232,99,42,0.4); }
+
+  /* PREVIEW PANEL */
+  .preview-panel { position: sticky; top: 80px; }
+  .preview-title { font-weight: 700; font-size: 1rem; color: var(--light-ink); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  .slip-live-preview {
+    background: #fff; border: 2px dashed var(--border);
+    border-radius: 16px; padding: 2rem;
+    min-height: 160px; position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .slip-preview-content {
+    text-align: left; width: 100%;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, #fff8f0, #fff);
+    border: 1.5px solid #e8632a33;
+    border-radius: 12px;
+    box-shadow: 0 3px 16px rgba(232,99,42,0.1);
+    position: relative;
+  }
+  .preview-school { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); }
+  .preview-name { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: var(--ink); line-height: 1.1; margin: 0.2rem 0; }
+  .preview-class { font-size: 0.9rem; color: var(--light-ink); }
+  .preview-placeholder { color: #ccc; font-size: 0.9rem; }
+  .templates-row {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem;
+    margin-top: 1.5rem;
+  }
+  .template-thumb {
+    border-radius: 10px; padding: 0.7rem 0.9rem;
+    cursor: pointer; border: 2px solid transparent;
+    transition: border-color 0.2s, transform 0.15s;
+    text-align: left;
+  }
+  .template-thumb:hover { transform: scale(1.04); }
+  .template-thumb.active { border-color: var(--accent); }
+  .template-thumb.t1 { background: #fff8f0; }
+  .template-thumb.t2 { background: #f0f8ff; }
+  .template-thumb.t3 { background: #f0f8f4; }
+  .template-thumb.t4 { background: #fdf6e3; }
+  .template-thumb.t5 { background: #f9f0ff; }
+  .template-thumb.t6 { background: #fff0f0; }
+  .t-name { font-size: 0.7rem; font-weight: 700; }
+  .t-label { font-size: 0.6rem; color: var(--light-ink); }
+  .coming-soon-badge {
+    font-size: 0.55rem; background: var(--accent2);
+    color: #fff; padding: 0.1rem 0.4rem; border-radius: 100px;
+    font-weight: 700; margin-left: 0.3rem;
+  }
+  .info-cards { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; }
+  .info-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 12px; padding: 1rem 1.2rem;
+    display: flex; align-items: flex-start; gap: 0.8rem;
+  }
+  .info-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .info-text strong { font-size: 0.85rem; display: block; margin-bottom: 0.15rem; }
+  .info-text span { font-size: 0.78rem; color: var(--light-ink); line-height: 1.5; }
+
+  /* PRICING */
+  .pricing-section { background: var(--cream); }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; }
+  .pricing-card {
+    background: #fff; border-radius: 20px;
+    padding: 2rem 1.8rem; border: 1.5px solid var(--border);
+    position: relative; transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .pricing-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+  .pricing-card.featured {
+    border-color: var(--accent); background: var(--ink); color: #fff;
+    transform: scale(1.04);
+  }
+  .pricing-card.featured:hover { transform: scale(1.04) translateY(-5px); }
+  .best-value {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: #fff;
+    font-size: 0.72rem; font-weight: 700;
+    padding: 0.2rem 1rem; border-radius: 100px;
+    white-space: nowrap;
+  }
+  .plan-name { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--light-ink); margin-bottom: 0.5rem; }
+  .featured .plan-name { color: #8888a8; }
+  .plan-qty { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: var(--ink); }
+  .featured .plan-qty { color: #fff; }
+  .plan-qty span { font-size: 1rem; font-weight: 500; }
+  .plan-price { font-size: 2.5rem; font-weight: 900; font-family: 'Playfair Display', serif; color: var(--accent); margin: 0.5rem 0; }
+  .featured .plan-price { color: var(--accent2); }
+  .plan-per { font-size: 0.78rem; color: var(--light-ink); }
+  .featured .plan-per { color: #8888a8; }
+  .plan-features { list-style: none; margin: 1.2rem 0; display: flex; flex-direction: column; gap: 0.5rem; }
+  .plan-features li { font-size: 0.88rem; display: flex; align-items: center; gap: 0.5rem; color: var(--light-ink); }
+  .featured .plan-features li { color: #c0c0d8; }
+  .plan-features li::before { content: '✓'; color: var(--green); font-weight: 700; }
+  .featured .plan-features li::before { color: var(--accent2); }
+
+  /* TESTIMONIALS */
+  .reviews-section { background: var(--warm); }
+  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; }
+  .review-card {
+    background: #fff; border-radius: 18px; padding: 1.8rem;
+    border: 1.5px solid var(--border); box-shadow: var(--shadow);
+  }
+  .stars { color: var(--accent2); font-size: 0.9rem; margin-bottom: 0.8rem; }
+  .review-text { font-size: 0.92rem; color: var(--ink); line-height: 1.6; margin-bottom: 1.2rem; font-style: italic; }
+  .reviewer { display: flex; align-items: center; gap: 0.7rem; }
+  .reviewer-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.9rem; color: #fff;
+  }
+  .reviewer-name { font-weight: 700; font-size: 0.88rem; }
+  .reviewer-role { font-size: 0.75rem; color: var(--light-ink); }
+
+  /* FOOTER */
+  footer {
+    background: var(--ink); color: #fff;
+    padding: 3rem 5vw 2rem;
+  }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+  .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; margin-bottom: 0.8rem; }
+  .footer-logo span { color: var(--accent); }
+  .footer-desc { font-size: 0.85rem; color: #8888a8; line-height: 1.6; }
+  .footer-col h4 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #8888a8; margin-bottom: 1rem; }
+  .footer-col a { display: block; font-size: 0.88rem; color: #c0c0d8; text-decoration: none; margin-bottom: 0.5rem; transition: color 0.2s; }
+  .footer-col a:hover { color: var(--accent); }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+  .footer-copy { font-size: 0.82rem; color: #6060808; }
+
+  /* SUCCESS MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(26,26,46,0.6); z-index: 1000;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: #fff; border-radius: 24px;
+    padding: 3rem; max-width: 440px; width: 90%;
+    text-align: center; box-shadow: var(--shadow-lg);
+  }
+  .modal-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900; margin-bottom: 0.8rem; }
+  .modal-sub { font-size: 0.9rem; color: var(--light-ink); line-height: 1.6; margin-bottom: 2rem; }
+  .modal-close { background: var(--ink); color: #fff; border: none; padding: 0.8rem 2rem; border-radius: 100px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.95rem; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; text-align: center; padding-top: 3rem; }
+    .hero-sub { margin: 0 auto 2rem; }
+    .hero-actions { justify-content: center; }
+    .hero-stats { justify-content: center; }
+    .hero-visual { display: none; }
+    .steps-grid { grid-template-columns: repeat(2, 1fr); }
+    .order-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .pricing-card.featured { transform: none; }
+    .reviews-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .steps-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-text > * {
+    animation: fadeUp 0.6s ease forwards;
+    opacity: 0;
+  }
+  .hero-text > *:nth-child(1) { animation-delay: 0.1s; }
+  .hero-text > *:nth-child(2) { animation-delay: 0.2s; }
+  .hero-text > *:nth-child(3) { animation-delay: 0.3s; }
+  .hero-text > *:nth-child(4) { animation-delay: 0.4s; }
+  .hero-text > *:nth-child(5) { animation-delay: 0.5s; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">NameTag<span>Studio</span></div>
+  <div class="nav-links">
+    <a href="#how-it-works">How It Works</a>
+    <a href="#order">Order Now</a>
+    <a href="#pricing">Pricing</a>
+    <a href="admin.html" style="color:var(--accent)">Admin ↗</a>
+    <a href="#order" class="nav-cta">Order Now</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-badge">Trusted by 500+ Schools in India</div>
+    <h1>Beautiful<br><em>Name Slips</em><br>for Notebooks</h1>
+    <p class="hero-sub">Custom-printed, school-ready name slips delivered to your door. Choose a design, fill in details, and we handle the rest.</p>
+    <div class="hero-actions">
+      <a href="#order" class="btn-primary">Order Your Slips →</a>
+      <a href="#pricing" class="btn-outline">See Pricing</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">50+</div>
+        <div class="stat-label">Templates</div>
+      </div>
+      <div>
+        <div class="stat-num">24hr</div>
+        <div class="stat-label">Dispatch</div>
+      </div>
+      <div>
+        <div class="stat-num">₹1.5</div>
+        <div class="stat-label">Per Slip</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="slip-preview-stack">
+      <div class="slip-card card-1">
+        <div class="slip-school">Delhi Public School</div>
+        <div class="slip-name">Aarav Sharma</div>
+        <div class="slip-class">Class 5 – A | Roll No. 12</div>
+        <div class="slip-deco slip-deco-1">📚</div>
+      </div>
+      <div class="slip-card card-2">
+        <div class="slip-school">St. Mary's Convent</div>
+        <div class="slip-name">Priya Kapoor</div>
+        <div class="slip-class">Class 7 – B | Roll No. 08</div>
+        <div class="slip-deco slip-deco-2">✏️</div>
+      </div>
+      <div class="slip-card card-3">
+        <div class="slip-school">Kendriya Vidyalaya</div>
+        <div class="slip-name">Rohan Verma</div>
+        <div class="slip-class">Class 3 – C | Roll No. 24</div>
+        <div class="slip-deco slip-deco-3">🌟</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-it-works" id="how-it-works">
+  <div class="section-label">Process</div>
+  <div class="section-title">Simple as 1-2-3-4</div>
+  <p class="section-sub">From order to your hands in under 3 days. Here's how it works.</p>
+  <div class="steps-grid">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-icon">🎨</div>
+      <div class="step-title">Choose Template</div>
+      <div class="step-desc">Browse from our growing library of beautiful, school-appropriate slip designs.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-icon">✏️</div>
+      <div class="step-title">Enter Details</div>
+      <div class="step-desc">Fill in student name, class, school name, roll number and any custom text.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-icon">💳</div>
+      <div class="step-title">Pay Securely</div>
+      <div class="step-desc">Pay via UPI, Credit/Debit card, or Net Banking. Fully secured by Razorpay.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-icon">📦</div>
+      <div class="step-title">Get Delivered</div>
+      <div class="step-desc">Receive your printed name slips at your doorstep within 2–3 business days.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ORDER FORM -->
+<section class="order-section" id="order">
+  <div class="section-label">Place Your Order</div>
+  <div class="section-title">Customise Your Slips</div>
+  <div class="order-grid">
+    <div class="form-card">
+      <div class="form-title">📝 Order Details</div>
+      <div class="form-group">
+        <label>Student Name *</label>
+        <input type="text" id="f-name" placeholder="e.g. Aarav Sharma" oninput="updatePreview()">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Class / Grade *</label>
+          <input type="text" id="f-class" placeholder="e.g. 5 – A" oninput="updatePreview()">
+        </div>
+        <div class="form-group">
+          <label>Roll Number</label>
+          <input type="text" id="f-roll" placeholder="e.g. 12" oninput="updatePreview()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>School Name *</label>
+        <input type="text" id="f-school" placeholder="e.g. Delhi Public School" oninput="updatePreview()">
+      </div>
+      <div class="form-group">
+        <label>Quantity</label>
+        <div class="quantity-control">
+          <button class="qty-btn" onclick="changeQty(-10)">−</button>
+          <input type="number" id="qty-display" value="50" readonly>
+          <button class="qty-btn" onclick="changeQty(10)">+</button>
+        </div>
+        <div style="font-size:0.75rem;color:var(--light-ink);margin-top:0.4rem">Minimum 20 slips. Available in multiples of 10.</div>
+      </div>
+      <div class="form-group">
+        <label>Special Instructions</label>
+        <textarea id="f-notes" placeholder="Any special requests, font preferences, etc."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Delivery Address *</label>
+        <textarea id="f-address" placeholder="Full address including city, state, PIN"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Phone / WhatsApp *</label>
+        <input type="tel" id="f-phone" placeholder="10-digit mobile number">
+      </div>
+      <div class="price-breakdown">
+        <div class="price-row"><span>Slips (<span id="qty-label">50</span> × ₹2.00)</span><span id="slip-total">₹100.00</span></div>
+        <div class="price-row"><span>Printing & Processing</span><span>₹30.00</span></div>
+        <div class="price-row"><span>Delivery</span><span id="delivery-fee">₹40.00</span></div>
+        <div class="price-row total"><span>Total</span><span id="grand-total">₹170.00</span></div>
+      </div>
+      <button class="submit-btn" onclick="submitOrder()">Proceed to Payment →</button>
+    </div>
+
+    <div class="preview-panel">
+      <div class="preview-title">👁 Live Preview</div>
+      <div class="slip-live-preview">
+        <div class="slip-preview-content" id="preview-content">
+          <div class="preview-school" id="prev-school">YOUR SCHOOL NAME</div>
+          <div class="preview-name" id="prev-name">Student Name</div>
+          <div class="preview-class" id="prev-class">Class – | Roll No.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:1.5rem">
+        <div class="preview-title">🎨 Choose Template</div>
+        <div class="templates-row">
+          <div class="template-thumb t1 active" onclick="selectTemplate(this,'#fff8f0','#e8632a')">
+            <div class="t-name">Warm</div>
+            <div class="t-label">Orange tones</div>
+          </div>
+          <div class="template-thumb t2" onclick="selectTemplate(this,'#f0f8ff','#2055a8')">
+            <div class="t-name">Ocean</div>
+            <div class="t-label">Blue tones</div>
+          </div>
+          <div class="template-thumb t3" onclick="selectTemplate(this,'#f0f8f4','#2d6a4f')">
+            <div class="t-name">Forest</div>
+            <div class="t-label">Green tones</div>
+          </div>
+          <div class="template-thumb t4" onclick="selectTemplate(this,'#fdf6e3','#c68b00')">
+            <div class="t-name">Golden</div>
+            <div class="t-label">Yellow tones</div>
+          </div>
+          <div class="template-thumb t5" onclick="selectTemplate(this,'#f9f0ff','#7b2fa0')">
+            <div class="t-name">Violet <span class="coming-soon-badge">SOON</span></div>
+            <div class="t-label">Purple tones</div>
+          </div>
+          <div class="template-thumb t6" onclick="selectTemplate(this,'#fff0f0','#c0392b')">
+            <div class="t-name">Rose <span class="coming-soon-badge">SOON</span></div>
+            <div class="t-label">Red tones</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-cards">
+        <div class="info-card">
+          <div class="info-icon">🖨️</div>
+          <div class="info-text">
+            <strong>High-Quality Print</strong>
+            <span>Printed on glossy art paper, water-resistant coating. Perfect for pasting on notebooks.</span>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">📏</div>
+          <div class="info-text">
+            <strong>Standard Size</strong>
+            <span>Each slip is 8.5 cm × 5.5 cm — fits perfectly on all standard notebook covers.</span>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">🚚</div>
+          <div class="info-text">
+            <strong>Fast Dispatch</strong>
+            <span>Orders are processed within 24 hours and delivered across India in 2–3 business days.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="section-label">Pricing</div>
+  <div class="section-title">Simple, Transparent Pricing</div>
+  <p class="section-sub">The more you order, the more you save. Perfect for individual families or whole classrooms.</p>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="plan-name">Starter Pack</div>
+      <div class="plan-qty">20–49 <span>slips</span></div>
+      <div class="plan-price">₹2.50</div>
+      <div class="plan-per">per slip</div>
+      <ul class="plan-features">
+        <li>1 template design</li>
+        <li>1 student name</li>
+        <li>All details printed</li>
+        <li>Delivery in 3–4 days</li>
+      </ul>
+      <a href="#order" class="btn-outline" style="display:block;text-align:center;margin-top:1rem">Order Now</a>
+    </div>
+    <div class="pricing-card featured">
+      <div class="best-value">⭐ Most Popular</div>
+      <div class="plan-name">Family Pack</div>
+      <div class="plan-qty">50–99 <span>slips</span></div>
+      <div class="plan-price">₹2.00</div>
+      <div class="plan-per">per slip</div>
+      <ul class="plan-features">
+        <li>Any template</li>
+        <li>Up to 2 student names</li>
+        <li>All details printed</li>
+        <li>Delivery in 2–3 days</li>
+        <li>Free lamination upgrade</li>
+      </ul>
+      <a href="#order" class="btn-primary" style="display:block;text-align:center;margin-top:1rem">Order Now</a>
+    </div>
+    <div class="pricing-card">
+      <div class="plan-name">Bulk / School</div>
+      <div class="plan-qty">100+ <span>slips</span></div>
+      <div class="plan-price">₹1.50</div>
+      <div class="plan-per">per slip</div>
+      <ul class="plan-features">
+        <li>Any template</li>
+        <li>Multiple student names</li>
+        <li>Bulk customisation</li>
+        <li>Priority dispatch</li>
+        <li>School logo printing</li>
+        <li>WhatsApp support</li>
+      </ul>
+      <a href="https://wa.me/91XXXXXXXXXX" class="btn-outline" style="display:block;text-align:center;margin-top:1rem" target="_blank">Contact on WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews-section">
+  <div class="section-label">Reviews</div>
+  <div class="section-title">Parents Love It</div>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="stars">★★★★★</div>
+      <div class="review-text">"Ordered 50 slips for my daughter's notebooks. The quality was absolutely amazing — glossy, vibrant, and stuck perfectly. Will order every year!"</div>
+      <div class="reviewer">
+        <div class="reviewer-avatar" style="background:#e8632a">S</div>
+        <div>
+          <div class="reviewer-name">Sunita Mehta</div>
+          <div class="reviewer-role">Parent, DPS Chandigarh</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="stars">★★★★★</div>
+      <div class="review-text">"Ordered for the whole class as the class teacher! So convenient and professional. Children were so excited to see their names printed beautifully."</div>
+      <div class="reviewer">
+        <div class="reviewer-avatar" style="background:#2d6a4f">R</div>
+        <div>
+          <div class="reviewer-name">Rajesh Kumar</div>
+          <div class="reviewer-role">Teacher, KV Sector 30</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="stars">★★★★☆</div>
+      <div class="review-text">"Fast delivery, beautiful design. The forest template I chose looked great. Would love even more template options. Overall very satisfied!"</div>
+      <div class="reviewer">
+        <div class="reviewer-avatar" style="background:#f0a500">P</div>
+        <div>
+          <div class="reviewer-name">Preeti Singh</div>
+          <div class="reviewer-role">Parent, St. Xavier's School</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo">NameTag<span>Studio</span></div>
+      <p class="footer-desc">India's finest custom name slips for school notebooks. Handcrafted designs, premium print, fast delivery.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#order">Order Now</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="#">WhatsApp Us</a>
+      <a href="#">Track Order</a>
+      <a href="#">Returns Policy</a>
+      <a href="#">FAQ</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <a href="#">📱 +91 XXXXX XXXXX</a>
+      <a href="#">📧 hello@nametagstudio.in</a>
+      <a href="#">📍 Chandigarh, India</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 NameTagStudio. All rights reserved.</span>
+    <span style="font-size:0.82rem;color:#6060808">Privacy Policy · Terms of Service</span>
+  </div>
+</footer>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-icon">🎉</div>
+    <div class="modal-title">Order Placed!</div>
+    <p class="modal-sub">Your order has been received. We'll WhatsApp you a confirmation within 30 minutes. Your slips will be dispatched within 24 hours!</p>
+    <button class="modal-close" onclick="closeModal()">Great, Thanks!</button>
+  </div>
+</div>
+
+<script>
+  // ─── Live Preview ───
+  function updatePreview() {
+    const name = document.getElementById('f-name').value || 'Student Name';
+    const cls = document.getElementById('f-class').value || '–';
+    const roll = document.getElementById('f-roll').value || '';
+    const school = document.getElementById('f-school').value || 'YOUR SCHOOL NAME';
+    document.getElementById('prev-name').textContent = name;
+    document.getElementById('prev-class').textContent = `Class ${cls}${roll ? ' | Roll No. ' + roll : ''}`;
+    document.getElementById('prev-school').textContent = school.toUpperCase();
+  }
+
+  // ─── Template Select ───
+  function selectTemplate(el, bg, color) {
+    document.querySelectorAll('.template-thumb').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    const preview = document.getElementById('preview-content');
+    preview.style.background = `linear-gradient(135deg, ${bg}, #fff)`;
+    preview.style.borderColor = color + '44';
+    document.getElementById('prev-school').style.color = color;
+  }
+
+  // ─── Quantity & Price ───
+  let qty = 50;
+  function changeQty(delta) {
+    qty = Math.max(20, qty + delta);
+    document.getElementById('qty-display').value = qty;
+    updatePrice();
+  }
+  function updatePrice() {
+    const perSlip = qty >= 100 ? 1.50 : qty >= 50 ? 2.00 : 2.50;
+    const slipTotal = qty * perSlip;
+    const delivery = qty >= 100 ? 0 : 40;
+    const grand = slipTotal + 30 + delivery;
+    document.getElementById('qty-label').textContent = qty;
+    document.getElementById('slip-total').textContent = `₹${slipTotal.toFixed(2)}`;
+    document.getElementById('delivery-fee').textContent = delivery === 0 ? 'FREE' : `₹${delivery.toFixed(2)}`;
+    document.getElementById('grand-total').textContent = `₹${grand.toFixed(2)}`;
+    // Also update the per-slip rate shown
+    const priceRow = document.querySelector('.price-breakdown .price-row:first-child span:first-child');
+    priceRow.textContent = `Slips (${qty} × ₹${perSlip.toFixed(2)})`;
+  }
+
+  // ─── Order Submission (connects to Razorpay) ───
+  function submitOrder() {
+    const name = document.getElementById('f-name').value;
+    const school = document.getElementById('f-school').value;
+    const phone = document.getElementById('f-phone').value;
+    const address = document.getElementById('f-address').value;
+    if (!name || !school || !phone || !address) {
+      alert('Please fill in all required fields (Name, School, Phone, Address).');
+      return;
+    }
+    // ── RAZORPAY INTEGRATION ──
+    // Replace 'YOUR_RAZORPAY_KEY' with your actual key from Razorpay dashboard
+    const perSlip = qty >= 100 ? 1.50 : qty >= 50 ? 2.00 : 2.50;
+    const slipTotal = qty * perSlip;
+    const delivery = qty >= 100 ? 0 : 40;
+    const amountPaise = Math.round((slipTotal + 30 + delivery) * 100); // Razorpay uses paise
+
+    if (typeof Razorpay === 'undefined') {
+      // Razorpay not loaded — show mock success for demo
+      document.getElementById('modal').classList.add('active');
+      return;
+    }
+
+    const options = {
+      key: 'YOUR_RAZORPAY_KEY', // ← Replace this
+      amount: amountPaise,
+      currency: 'INR',
+      name: 'NameTag Studio',
+      description: `${qty} Custom Name Slips`,
+      image: '',
+      prefill: { name: name, contact: phone },
+      notes: { school: school, address: address, qty: qty, student: name },
+      theme: { color: '#e8632a' },
+      handler: function(response) {
+        // Payment success — show modal
+        document.getElementById('modal').classList.add('active');
+        // Optionally: send order details to your backend here
+        console.log('Payment ID:', response.razorpay_payment_id);
+      }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+  }
+</script>
+
+<!-- Load Razorpay SDK (remove this comment and uncomment when you have your key) -->
+<!-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script> -->
+</body>
+</html>
